@@ -1,6 +1,6 @@
 import pygame as pg
 import _ui
-from lib import grid
+from lib.grid import Grid
 from lib.settings import *
 
 class UI(_ui.Mixin):
@@ -14,7 +14,7 @@ class UI(_ui.Mixin):
         pg.init()
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         pg.display.set_caption("Shortest Path")
-        self.grid = grid.Grid(TILESIZE, TILEWIDTH, TILEHEIGHT, X_OFFSET, Y_OFFSET)
+        self.grid = Grid(TILESIZE, (TILEWIDTH, TILEHEIGHT), (X_OFFSET, Y_OFFSET))
         self.clock = pg.time.Clock()
         self.running = True
         self.playing = True
@@ -49,10 +49,18 @@ class UI(_ui.Mixin):
                 if self.playing:
                     self.playing = False
                 self.running = False
-            if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                pos = pg.mouse.get_pos()
-                cell = self.grid.get_cell(pos)
-                print("clicking:", pos, cell)
+
+            pos = pg.mouse.get_pos()
+            keys = pg.key.get_pressed()
+            click = pg.mouse.get_pressed(3)
+            if click[0] and keys[pg.K_LSHIFT]:
+                self.grid.add_cell_color(pos, GREEN, 1)
+            elif click[2] and keys[pg.K_LSHIFT]:
+                self.grid.add_cell_color(pos, RED, 1)
+            elif click[0] and not keys[pg.K_LSHIFT]:
+                self.grid.add_cell_color(pos, BLACK)
+            elif click[2] and not keys[pg.K_LSHIFT]:
+                self.grid.add_cell_color(pos, WHITE)
 
     def update(self):
         """
