@@ -2,6 +2,7 @@ import pygame as pg
 import _ui
 from lib.grid import Grid
 from lib.settings import *
+from main import ShortestPath
 
 class UI(_ui.Mixin):
     """
@@ -13,6 +14,7 @@ class UI(_ui.Mixin):
         """
         pg.init()
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
+        self.sp = ShortestPath((0, 0), (TILEWIDTH - 1, TILEHEIGHT-1), TILEWIDTH, TILEHEIGHT)
         pg.display.set_caption("Shortest Path")
         self.grid = Grid(TILESIZE, (TILEWIDTH, TILEHEIGHT), (X_OFFSET, Y_OFFSET))
         self.clock = pg.time.Clock()
@@ -57,13 +59,13 @@ class UI(_ui.Mixin):
             keys = pg.key.get_pressed()
             click = pg.mouse.get_pressed(3)
             if click[0] and keys[pg.K_LSHIFT]:
-                self.grid.add_cell_color(cell, GREEN, 1)
+                self.alter_start(self.grid, cell, self.sp)
             elif click[2] and keys[pg.K_LSHIFT]:
-                self.grid.add_cell_color(cell, RED, 1)
+                self.alter_end(self.grid, cell, self.sp)
             elif click[0] and not keys[pg.K_LSHIFT]:
-                self.grid.add_cell_color(cell, BLACK)
+                self.add_walls(self.grid, cell, self.sp)
             elif click[2] and not keys[pg.K_LSHIFT]:
-                self.grid.add_cell_color(cell, WHITE)
+                self.remove_walls(self.grid, cell, self.sp)
 
     def update(self):
         """

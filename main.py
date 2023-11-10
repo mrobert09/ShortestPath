@@ -4,8 +4,27 @@ from math import dist
 
 class ShortestPath:
 
-    def __init__(self):
-        return
+    def __init__(self, start, end, width, height):
+        self.start = start
+        self.end = end
+        self.width = width
+        self.height = height
+        self.blocked_points = set()
+        self.path_dict = self.generate_path_dictionary(self.start, self.width, self.height, self.blocked_points)
+
+
+    def update_cell(self, cell, value):
+        match cell:
+            case "start":
+                self.start = value
+            case "end":
+                self.end = value
+            case "add":
+                self.blocked_points.add(value)
+            case "remove":
+                self.blocked_points.discard(value)
+            case _:
+                return
 
     def find_adjacent(self, point, path_dict, adjacent_points, max_x, max_y):
         for x in range(-1, 2):
@@ -36,12 +55,9 @@ class ShortestPath:
         return path_dict
 
 
-    def generate_blocked(self):
-        blocked_points = []
-        blocked_points.append((1, 0))
-        blocked_points.append((1, 1))
-        blocked_points.append((2, 1))
-        return blocked_points
+    # def generate_blocked(self):
+    #     blocked_points = set()
+    #     return blocked_points
 
 
     def find_distance(self, start_point, end_point, path_dict, path=None, total=0):
@@ -60,21 +76,20 @@ class ShortestPath:
         return self.find_distance(start_point, prev_point, path_dict, path, total)
 
 
+    def __repr__(self):
+        distance, path = self.find_distance(self.start, self.end, self.path_dict)
+        s = "Distance: " + str(distance) + "\n" + "Path: " + str(path)
+        return s
+
+
 def main():
     max_grid_x = 5
     max_grid_y = 5
     starting_point = (2, 0)
     ending_point = (0, 0)
 
-    sp = ShortestPath()
-
-    blocked_points = sp.generate_blocked()
-    path_dict = sp.generate_path_dictionary(starting_point, max_grid_x, max_grid_y, blocked_points)
-
-
-    distance, path = sp.find_distance(starting_point, ending_point, path_dict)
-    print(distance)
-    print(path)
+    sp = ShortestPath(starting_point, ending_point, max_grid_x, max_grid_y)
+    print(sp)
 
 
 if __name__ == '__main__':
