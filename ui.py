@@ -32,8 +32,10 @@ class UI(_ui.Mixin):
         Game Loop
         :return:
         """
+        self.grid.add_cell_color((0, 0), GREEN, 1)
+        self.grid.add_cell_color((TILEWIDTH - 1, TILEHEIGHT - 1), RED, 1)
         while self.playing:
-            self.clock.tick(60)
+            self.clock.tick(1000)
             self.events()
             self.update()
             self.draw()
@@ -51,16 +53,17 @@ class UI(_ui.Mixin):
                 self.running = False
 
             pos = pg.mouse.get_pos()
+            cell = self.grid.get_cell(pos)
             keys = pg.key.get_pressed()
             click = pg.mouse.get_pressed(3)
             if click[0] and keys[pg.K_LSHIFT]:
-                self.grid.add_cell_color(pos, GREEN, 1)
+                self.grid.add_cell_color(cell, GREEN, 1)
             elif click[2] and keys[pg.K_LSHIFT]:
-                self.grid.add_cell_color(pos, RED, 1)
+                self.grid.add_cell_color(cell, RED, 1)
             elif click[0] and not keys[pg.K_LSHIFT]:
-                self.grid.add_cell_color(pos, BLACK)
+                self.grid.add_cell_color(cell, BLACK)
             elif click[2] and not keys[pg.K_LSHIFT]:
-                self.grid.add_cell_color(pos, WHITE)
+                self.grid.add_cell_color(cell, WHITE)
 
     def update(self):
         """

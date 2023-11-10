@@ -8,8 +8,10 @@ class Grid:
         self.board_width = self.tile_size * self.tile_width
         self.board_height = self.tile_size * self.tile_height
         self.x_offset, self.y_offset = offset
-        self.cell_colors = {}  # organized by cells
-        self.unique_colored_cells = {}  # organized by colors
+        # organized by cells
+        self.cell_colors = {}
+        # organized by colors
+        self.unique_colored_cells = {}
 
     def get_cell(self, pos):
         """
@@ -40,8 +42,7 @@ class Grid:
             return x, y
 
 
-    def add_cell_color(self, pos, color, unique=0):
-        cell = self.get_cell(pos)
+    def add_cell_color(self, cell, color, unique=0):
         if unique:
             if color in self.unique_colored_cells.keys():
                 self.unique_colored_cells.pop(color)
