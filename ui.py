@@ -34,8 +34,8 @@ class UI(_ui.Mixin):
         Game Loop
         :return:
         """
-        self.grid.add_cell_color((0, 0), GREEN, 1)
-        self.grid.add_cell_color((TILEWIDTH - 1, TILEHEIGHT - 1), RED, 1)
+        # self.grid.add_cell_color((0, 0), GREEN, 1)
+        # self.grid.add_cell_color((TILEWIDTH - 1, TILEHEIGHT - 1), RED, 1)
         while self.playing:
             self.clock.tick(1000)
             self.events()
@@ -66,6 +66,8 @@ class UI(_ui.Mixin):
                 self.add_walls(self.grid, cell, self.sp)
             elif click[2] and not keys[pg.K_LSHIFT]:
                 self.remove_walls(self.grid, cell, self.sp)
+            elif event.type == pg.MOUSEBUTTONDOWN and event.button == 2:
+                self.sp.print_info()
 
     def update(self):
         """
@@ -73,6 +75,7 @@ class UI(_ui.Mixin):
         :return:
         """
         self.all_sprites.update()
+        self.update_colors(self.grid, self.sp)
 
     def draw(self):
         """

@@ -8,10 +8,7 @@ class Grid:
         self.board_width = self.tile_size * self.tile_width
         self.board_height = self.tile_size * self.tile_height
         self.x_offset, self.y_offset = offset
-        # organized by cells
-        self.cell_colors = {}
-        # organized by colors
-        self.unique_colored_cells = {}
+        self.cell_colors = {} # Color : Cell / set(Cells)
 
     def get_cell(self, pos):
         """
@@ -42,15 +39,6 @@ class Grid:
             return x, y
 
 
-    def add_cell_color(self, cell, color, unique=0):
-        if unique:
-            if color in self.unique_colored_cells.keys():
-                self.unique_colored_cells.pop(color)
-            self.unique_colored_cells[color] = cell
-        else:
-            self.cell_colors[cell] = color
-
-
     def draw_lines(self, screen):
         for x in range(0 + self.x_offset, self.board_width+1 + self.x_offset, self.tile_size):
             pg.draw.line(screen, BLACK, (x, 0 + self.y_offset), (x, self.board_height + self.y_offset))
@@ -59,7 +47,7 @@ class Grid:
 
 
     def color_cells(self, screen):
-        def color(cell, color):
+        def paint(cell, color):
             g_pos = self.global_pos(cell)
             if g_pos:
                 x, y = g_pos
@@ -70,11 +58,13 @@ class Grid:
                 surface.fill(color)
                 screen.blit(surface, (x + 1, y + 1))
 
-        for cell in self.cell_colors:
-            color(cell, self.cell_colors[cell])
-
-        for unique_color in self.unique_colored_cells:
-            color(self.unique_colored_cells[unique_color], unique_color)
+        for color in self.cell_colors:
+            if type(self.cell_colors[color]) is tuple:
+                paint(self.cell_colors[color], color)
+            else:
+                if type(self.cell_colors[color]) is set:
+                    for cell in self.cell_colors[color]:
+                        paint(cell, color)
 
 
     def draw(self, screen):

@@ -13,16 +13,19 @@ class ShortestPath:
         self.path_dict = self.generate_path_dictionary(self.start, self.width, self.height, self.blocked_points)
 
 
-    def update_cell(self, cell, value):
-        match cell:
+    def update_cell(self, cell_type, cell):
+        match cell_type:
             case "start":
-                self.start = value
+                self.start = cell
+                self.blocked_points.discard(cell)
             case "end":
-                self.end = value
+                self.end = cell
+                self.blocked_points.discard(cell)
             case "add":
-                self.blocked_points.add(value)
+                if cell != self.start and cell != self.end:
+                    self.blocked_points.add(cell)
             case "remove":
-                self.blocked_points.discard(value)
+                self.blocked_points.discard(cell)
             case _:
                 return
 
@@ -55,9 +58,10 @@ class ShortestPath:
         return path_dict
 
 
-    # def generate_blocked(self):
-    #     blocked_points = set()
-    #     return blocked_points
+    def print_info(self):
+        print("\nStart:", self.start)
+        print("End:", self.end)
+        print("Blocked:", self.blocked_points)
 
 
     def find_distance(self, start_point, end_point, path_dict, path=None, total=0):
