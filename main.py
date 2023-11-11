@@ -14,7 +14,6 @@ class ShortestPath:
         self.path = set()
         self.calculate_path()
 
-
     def update_cell(self, cell_type, cell):
         match cell_type:
             case "start":
@@ -42,15 +41,12 @@ class ShortestPath:
                             return
                     adjacent_points.put([next_point, point, dist(next_point, point)])
 
-
     def check_kitty_corners(self, point, next_point):
         x1, y1 = point
         x2, y2 = next_point
         if (x1, y2) in self.blocked_points and (x2, y1) in self.blocked_points:
             return False
         return True
-
-
 
     def generate_path_dictionary(self):
         p_dict = {}
@@ -79,7 +75,6 @@ class ShortestPath:
 
         self.path_dict = p_dict
 
-
     def print_info(self):
         print("\nStart:", self.start)
         print("End:", self.end)
@@ -88,9 +83,8 @@ class ShortestPath:
         print("Dict: ")
         print(self.path_dict)
 
-
     def find_distance(self, end_point, path=None, total=0):
-        if path == None:
+        if path is None:
             path = []
 
         # path_dict[point] = [connected from point, distance from connected point]
@@ -103,16 +97,14 @@ class ShortestPath:
         path.append(end_point)
         if weight == 0:
             self.path = set(path[::-1])
-            return (total, path[::-1])  # Because path fills in reverse, we reorient it here
+            return total, path[::-1]  # Because path fills in reverse, we reorient it here
         total += weight
 
         return self.find_distance(prev_point, path, total)
 
-
     def calculate_path(self):
         self.generate_path_dictionary()
         self.find_distance(self.end)
-
 
     def __repr__(self):
         output = self.find_distance(self.end)

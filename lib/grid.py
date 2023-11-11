@@ -1,6 +1,7 @@
 import pygame as pg
 from lib.settings import *
 
+
 class Grid:
     def __init__(self, tile_size, tile_dimensions, offset):
         self.tile_size = tile_size
@@ -8,7 +9,7 @@ class Grid:
         self.board_width = self.tile_size * self.tile_width
         self.board_height = self.tile_size * self.tile_height
         self.x_offset, self.y_offset = offset
-        self.cell_colors = {} # Color : Cell / set(Cells)
+        self.cell_colors = {}  # Color : Cell / set(Cells)
 
     def get_cell(self, pos):
         """
@@ -25,7 +26,6 @@ class Grid:
             x, y = int(x), int(y)
             return x, y
 
-
     def global_pos(self, cell):
         """
         Opposite of cell_pos method, converts a cell grid position to it's center pixel.
@@ -38,24 +38,22 @@ class Grid:
             y = y * self.tile_size + self.y_offset + self.tile_size/2
             return x, y
 
-
     def draw_lines(self, screen):
         for x in range(0 + self.x_offset, self.board_width+1 + self.x_offset, self.tile_size):
             pg.draw.line(screen, BLACK, (x, 0 + self.y_offset), (x, self.board_height + self.y_offset))
         for y in range(0 + self.y_offset, self.board_height+1 + self.y_offset, self.tile_size):
             pg.draw.line(screen, BLACK, (0 + self.x_offset, y), (self.board_width + self.x_offset, y))
 
-
     def color_cells(self, screen):
-        def paint(cell, color):
-            g_pos = self.global_pos(cell)
+        def paint(cell_, color_):
+            g_pos = self.global_pos(cell_)
             if g_pos:
                 x, y = g_pos
                 # Target corner of cell for start of coloring
                 x -= self.tile_size / 2
                 y -= self.tile_size / 2
-                surface = pg.Surface((self.tile_size - 1, self.tile_size - 1)) # prevents border coloring
-                surface.fill(color)
+                surface = pg.Surface((self.tile_size - 1, self.tile_size - 1))  # prevents border coloring
+                surface.fill(color_)
                 screen.blit(surface, (x + 1, y + 1))
 
         for color in self.cell_colors:
@@ -65,7 +63,6 @@ class Grid:
                 if type(self.cell_colors[color]) is set:
                     for cell in self.cell_colors[color]:
                         paint(cell, color)
-
 
     def draw(self, screen):
         """

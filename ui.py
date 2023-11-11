@@ -4,6 +4,7 @@ from lib.grid import Grid
 from lib.settings import *
 from main import ShortestPath
 
+
 class UI(_ui.Mixin):
     """
     Instance of PyGame.
