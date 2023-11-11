@@ -59,13 +59,13 @@ class UI(_ui.Mixin):
             keys = pg.key.get_pressed()
             click = pg.mouse.get_pressed(3)
             if click[0] and keys[pg.K_LSHIFT]:
-                self.alter_start(self.grid, cell, self.sp)
+                self.alter_start(cell, self.sp)
             elif click[2] and keys[pg.K_LSHIFT]:
-                self.alter_end(self.grid, cell, self.sp)
+                self.alter_end(cell, self.sp)
             elif click[0] and not keys[pg.K_LSHIFT]:
-                self.add_walls(self.grid, cell, self.sp)
+                self.add_walls(cell, self.sp)
             elif click[2] and not keys[pg.K_LSHIFT]:
-                self.remove_walls(self.grid, cell, self.sp)
+                self.remove_walls(cell, self.sp)
             elif event.type == pg.MOUSEBUTTONDOWN and event.button == 2:
                 self.sp.print_info()
 
@@ -75,6 +75,7 @@ class UI(_ui.Mixin):
         :return:
         """
         self.all_sprites.update()
+        self.sp.calculate_path()
         self.update_colors(self.grid, self.sp)
 
     def draw(self):

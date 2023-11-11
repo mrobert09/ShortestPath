@@ -10,7 +10,9 @@ class ShortestPath:
         self.width = width
         self.height = height
         self.blocked_points = set()
-        self.path_dict = self.generate_path_dictionary(self.start, self.width, self.height, self.blocked_points)
+        self.path_dict = {}
+        self.path = set()
+        self.calculate_path()
 
 
     def update_cell(self, cell_type, cell):
@@ -35,33 +37,56 @@ class ShortestPath:
                 next_point = ((point[0] + x), (point[1] + y))
                 if (max_x > point[0] + x >= 0 and max_y > point[1] + y >= 0 and
                         next_point not in path_dict):
+                    if dist(next_point, point) > 1:
+                        if not self.check_kitty_corners(point, next_point):
+                            return
                     adjacent_points.put([next_point, point, dist(next_point, point)])
 
 
+    def check_kitty_corners(self, point, next_point):
+        x1, y1 = point
+        x2, y2 = next_point
+        if (x1, y2) in self.blocked_points and (x2, y1) in self.blocked_points:
+            return False
+        return True
+
+
+
     def generate_path_dictionary(self, starting_point, max_x, max_y, blocked_points):
-        path_dict = {}
+        p_dict = {}
         adjacent_points = SimpleQueue()
 
         # Fill in blocked spaces
         for point in blocked_points:
-            path_dict[point] = None
+            p_dict[point] = None
 
-        path_dict[starting_point] = [starting_point, 0.0]
-        self.find_adjacent(starting_point, path_dict, adjacent_points, max_x, max_y)
+        p_dict[starting_point] = [starting_point, 0.0]
+        self.find_adjacent(starting_point, p_dict, adjacent_points, max_x, max_y)
 
         while not adjacent_points.empty():
-            next_point = adjacent_points.get()
-            if next_point[0] not in path_dict.keys():
-                path_dict[next_point[0]] = [next_point[1], next_point[2]]
-            self.find_adjacent(next_point[0], path_dict, adjacent_points, max_x, max_y)
+            point, prev_point, distance = adjacent_points.get()
+            prev_point_distance = p_dict[prev_point][1]
+            if point not in p_dict.keys():
+                # p_dict[point] = [point coming from, total distance from start]
+                p_dict[point] = [prev_point, distance + prev_point_distance]
+                self.find_adjacent(point, p_dict, adjacent_points, max_x, max_y)
+            else:
+                known_distance = p_dict[point][1]
+                # Check if new distance to point is less than already known distance. If so, update.
+                if distance + prev_point_distance < known_distance:
+                    p_dict[point] = [prev_point, distance + prev_point_distance]
+                    self.find_adjacent(point, p_dict, adjacent_points, max_x, max_y)
 
-        return path_dict
+        self.path_dict = p_dict
 
 
     def print_info(self):
         print("\nStart:", self.start)
         print("End:", self.end)
         print("Blocked:", self.blocked_points)
+        print("Path:", type(self.path), self.path)
+        print("Dict: ")
+        print(self.path_dict)
 
 
     def find_distance(self, start_point, end_point, path_dict, path=None, total=0):
@@ -69,28 +94,41 @@ class ShortestPath:
             path = []
 
         # path_dict[point] = [connected from point, distance from connected point]
+        if end_point not in path_dict.keys():
+            self.path.clear()
+            return
         prev_point = path_dict[end_point][0]
         weight = path_dict[end_point][1]
 
         path.append(end_point)
         if weight == 0:
+            self.path = set(path[::-1])
             return (total, path[::-1])  # Because path fills in reverse, we reorient it here
         total += weight
 
         return self.find_distance(start_point, prev_point, path_dict, path, total)
 
 
+    def calculate_path(self):
+        self.generate_path_dictionary(self.start, self.width, self.height, self.blocked_points)
+        self.find_distance(self.start, self.end, self.path_dict)
+
+
     def __repr__(self):
-        distance, path = self.find_distance(self.start, self.end, self.path_dict)
-        s = "Distance: " + str(distance) + "\n" + "Path: " + str(path)
-        return s
+        output = self.find_distance(self.start, self.end, self.path_dict)
+        if output:
+            distance, path = output
+            s = "Distance: " + str(distance) + "\n" + "Path: " + str(self.path)
+            return s
+        else:
+            return "No valid path to end."
 
 
 def main():
-    max_grid_x = 5
-    max_grid_y = 5
-    starting_point = (2, 0)
-    ending_point = (0, 0)
+    max_grid_x = 3
+    max_grid_y = 3
+    starting_point = (0, 0)
+    ending_point = (2, 2)
 
     sp = ShortestPath(starting_point, ending_point, max_grid_x, max_grid_y)
     print(sp)
