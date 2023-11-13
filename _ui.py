@@ -5,12 +5,12 @@ from lib.settings import *
 class Mixin:
     @staticmethod
     def alter_start(cell, path):
-        if cell:
+        if cell and cell not in path.blocked_points:
             path.update_cell("start", cell)
 
     @staticmethod
     def alter_end(cell, path):
-        if cell:
+        if cell and cell not in path.blocked_points:
             path.update_cell("end", cell)
 
     @staticmethod
