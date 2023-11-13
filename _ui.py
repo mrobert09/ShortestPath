@@ -1,3 +1,4 @@
+import pygame as pg
 from lib.settings import *
 
 
@@ -26,3 +27,9 @@ class Mixin:
         grid.cell_colors[GREEN] = path.start
         grid.cell_colors[RED] = path.end
         grid.cell_colors[BLACK] = path.blocked_points
+
+    def draw_text(self, screen, text, color, x, y, font=None):
+        if font is None:
+            font = pg.font.SysFont(FONT_NAME, FONT_SIZE)
+        text = font.render(text, True, color)
+        screen.blit(text, (x, y))

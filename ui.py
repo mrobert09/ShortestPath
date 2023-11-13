@@ -19,12 +19,13 @@ class UI(_ui.Mixin):
         self.sp = ShortestPath((0, 0), (TILEWIDTH - 1, TILEHEIGHT-1), TILEWIDTH, TILEHEIGHT)
         pg.display.set_caption("Shortest Path")
         self.grid = Grid(TILESIZE, (TILEWIDTH, TILEHEIGHT), (X_OFFSET, Y_OFFSET))
-        self.slider = Slider(600, 50, 150)
+        self.slider = Slider((600, 50), 150, 0, 100)
         self.slider_drag = False
         self.clock = pg.time.Clock()
         self.running = True
         self.playing = True
         self.all_sprites = pg.sprite.Group()
+        self.debug_text = ""
 
     def new(self):
         """
@@ -77,23 +78,12 @@ class UI(_ui.Mixin):
             elif event.type == pg.MOUSEBUTTONDOWN and event.button == 2:
                 self.sp.print_info()
 
-            # # Slider event logic
-            # if event.type == pg.MOUSEBUTTONDOWN:
-            #     self.slider_drag = self.slider.slider_clicked(pos)
-            #     if self.slider_drag:
-            #         mouse_x, _ = pg.mouse.get_pos()
-            #         self.slider.handle_x = max(min(mouse_x, self.slider.slider_x + self.slider.slider_length),
-            #                                    self.slider.slider_x)
-            # if event.type == pg.MOUSEBUTTONUP:
-            #     self.slider_drag = False
-
-
-
     def update(self):
         """
         Game Loop - Update
         :return:
         """
+        self.debug_text = str(self.slider.get_value())
         self.all_sprites.update()
         self.sp.calculate_path()
         self.update_colors(self.grid, self.sp)
@@ -105,6 +95,7 @@ class UI(_ui.Mixin):
         :return:
         """
         self.screen.fill((255, 255, 255))
+        self.draw_text(self.screen, self.debug_text, BLACK, 650, 75)
         self.grid.draw(self.screen)
         self.slider.draw(self.screen)
         self.all_sprites.draw(self.screen)

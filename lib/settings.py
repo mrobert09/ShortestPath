@@ -3,7 +3,7 @@ TITLE = "Chess"
 WIDTH = 800
 HEIGHT = 600
 FPS = 60
-# FONT_NAME = pg.font.match_font('arial')
+FONT_NAME = "Arial"
 FONT_SIZE = 20
 
 # define colors
