@@ -38,11 +38,31 @@ class Grid:
             y = y * self.tile_size + self.y_offset + self.tile_size/2
             return x, y
 
-    def draw_lines(self, screen):
-        for x in range(0 + self.x_offset, self.board_width+1 + self.x_offset, self.tile_size):
-            pg.draw.line(screen, BLACK, (x, 0 + self.y_offset), (x, self.board_height + self.y_offset))
-        for y in range(0 + self.y_offset, self.board_height+1 + self.y_offset, self.tile_size):
-            pg.draw.line(screen, BLACK, (0 + self.x_offset, y), (self.board_width + self.x_offset, y))
+    def draw_lines(self, screen, alpha=255):
+        """
+        Line drawing method for the grid that accepts needs accepts an alpha value. Draws the grid
+        on screen. Alpha amount adjusts interior line transparency. Outside edge stays at 255 alpha
+        leaving behind a box if grid fully transparent.
+        :param screen: PyGame surface
+        :param alpha: Transparency amount (0-255)
+        :return: None
+        """
+        # Draw interior lines
+        for x in range(self.x_offset + self.tile_size, self.board_width + self.x_offset, self.tile_size):
+            pg.draw.line(screen, BLACK + (alpha,), (x, self.y_offset), (x, self.board_height + self.y_offset))
+        for y in range(self.y_offset + self.tile_size, self.board_height + self.y_offset, self.tile_size):
+            pg.draw.line(screen, BLACK + (alpha,), (self.x_offset, y), (self.board_width + self.x_offset, y))
+
+        # Draw outside edges
+        pg.draw.line(screen, BLACK, (self.x_offset, self.y_offset),
+                     (self.x_offset, self.board_height + self.y_offset))
+        pg.draw.line(screen, BLACK, (self.board_width + self.x_offset, self.y_offset),
+                     (self.board_width + self.x_offset, self.board_height + self.y_offset))
+        pg.draw.line(screen, BLACK, (self.x_offset, self.y_offset),
+                     (self.board_width + self.x_offset, self.y_offset))
+        pg.draw.line(screen, BLACK, (self.x_offset, self.board_height + self.y_offset),
+                     (self.board_width + self.x_offset, self.board_height + self.y_offset))
+
 
     def color_cells(self, screen):
         def paint(cell_, color_):
@@ -52,9 +72,9 @@ class Grid:
                 # Target corner of cell for start of coloring
                 x -= self.tile_size / 2
                 y -= self.tile_size / 2
-                surface = pg.Surface((self.tile_size - 1, self.tile_size - 1))  # prevents border coloring
+                surface = pg.Surface((self.tile_size + 1, self.tile_size + 1))  # prevents border coloring
                 surface.fill(color_)
-                screen.blit(surface, (x + 1, y + 1))
+                screen.blit(surface, (x, y))
 
         for color in self.cell_colors:
             if type(self.cell_colors[color]) is tuple:
@@ -64,14 +84,14 @@ class Grid:
                     for cell in self.cell_colors[color]:
                         paint(cell, color)
 
-    def draw(self, screen):
+    def draw(self, screen, draw_surface, alpha):
         """
         Draws the grid elements onto the surface.
         :param screen: PyGame surface
         :return: None
         """
-        self.draw_lines(screen)
         self.color_cells(screen)
+        self.draw_lines(draw_surface, alpha)
 
 
 def main():

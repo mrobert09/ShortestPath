@@ -19,13 +19,14 @@ class UI(_ui.Mixin):
         self.sp = ShortestPath((0, 0), (TILEWIDTH - 1, TILEHEIGHT-1), TILEWIDTH, TILEHEIGHT)
         pg.display.set_caption("Shortest Path")
         self.grid = Grid(TILESIZE, (TILEWIDTH, TILEHEIGHT), (X_OFFSET, Y_OFFSET))
-        self.slider = Slider((600, 50), 150, 0, 100)
+        self.slider = Slider((600, 50), 150, 0, 255, initial_value=255)
         self.slider_drag = False
         self.clock = pg.time.Clock()
         self.running = True
         self.playing = True
         self.all_sprites = pg.sprite.Group()
         self.debug_text = ""
+        self.draw_surface = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
 
     def new(self):
         """
@@ -95,9 +96,10 @@ class UI(_ui.Mixin):
         :return:
         """
         self.screen.fill((255, 255, 255))
-        self.draw_text(self.screen, self.debug_text, BLACK, 650, 75)
-        self.grid.draw(self.screen)
+        self.grid.draw(self.screen, self.draw_surface, self.slider.get_value())
+        self.screen.blit(self.draw_surface, (0, 0))
         self.slider.draw(self.screen)
+        self.draw_text(self.screen, self.debug_text, BLACK, 650, 75)
         self.all_sprites.draw(self.screen)
         # always do last after drawing everything
         pg.display.flip()
