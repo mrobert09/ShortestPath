@@ -13,6 +13,7 @@ class Mixin:
         """
         if cell and cell not in path.blocked_points:
             path.update_cell("start", cell)
+            path.calculate_path()
 
     @staticmethod
     def alter_end(cell, path):
@@ -24,6 +25,7 @@ class Mixin:
         """
         if cell and cell not in path.blocked_points:
             path.update_cell("end", cell)
+            path.find_path(cell)
 
     @staticmethod
     def add_walls(cell, path):
@@ -34,6 +36,7 @@ class Mixin:
         :return: None
         """
         path.update_cell("add", cell)
+        path.calculate_path()
 
     @staticmethod
     def remove_walls(cell, path):
@@ -44,14 +47,14 @@ class Mixin:
         :return: None
         """
         path.update_cell("remove", cell)
+        path.calculate_path()
 
     @staticmethod
     def update_colors(app):
         """
         Static method used to update colors of cells based on their role.
-        :param grid: Grid object
-        :param path: ShortestPath algorithm
-        :return:
+        :param app: Main UI instance
+        :return: None
         """
         app.grid.cell_colors[YELLOW] = app.sp.path
         app.grid.cell_colors[GREEN] = app.sp.start

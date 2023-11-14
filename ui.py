@@ -90,7 +90,6 @@ class UI(_ui.Mixin):
         :return:
         """
         self.all_sprites.update()
-        self.sp.calculate_path()
         self.update_colors(self)
         self.update_text(self)
         self.slider.update()
