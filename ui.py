@@ -2,6 +2,7 @@ import pygame as pg
 import _ui
 from lib.grid import Grid
 from lib.slider import Slider
+from lib.switch import Switch
 from lib.settings import *
 from main import ShortestPath
 
@@ -15,18 +16,20 @@ class UI(_ui.Mixin):
         Init
         """
         pg.init()
-        self.screen = pg.display.set_mode((WIDTH, HEIGHT))
-        self.sp = ShortestPath((0, 0), (TILEWIDTH - 1, TILEHEIGHT-1), TILEWIDTH, TILEHEIGHT)
         pg.display.set_caption("Shortest Path")
+        self.clock = pg.time.Clock()
+        self.screen = pg.display.set_mode((WIDTH, HEIGHT))
+        self.draw_surface = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
+        self.sp = ShortestPath((0, 0), (TILEWIDTH - 1, TILEHEIGHT-1), TILEWIDTH, TILEHEIGHT)
         self.grid = Grid(TILESIZE, (TILEWIDTH, TILEHEIGHT), (X_OFFSET, Y_OFFSET))
         self.slider = Slider((600, 50), 150, 0, 255, initial_value=255)
         self.slider_drag = False
-        self.clock = pg.time.Clock()
-        self.running = True
-        self.playing = True
+        self.switch = Switch((625, 90), 100, 25)
+        self.text_widgets = []
         self.all_sprites = pg.sprite.Group()
-        self.debug_text = ""
-        self.draw_surface = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
+        self.playing = True
+        self.running = True
+
 
     def new(self):
         """
@@ -65,29 +68,31 @@ class UI(_ui.Mixin):
             click = pg.mouse.get_pressed(3)
 
             self.slider.handle_event(event)
+            self.switch.handle_event(event)
 
             # Grid event logic
             cell = self.grid.get_cell(pos)
-            if click[0] and keys[pg.K_LSHIFT]:
-                self.alter_start(cell, self.sp)
-            elif click[2] and keys[pg.K_LSHIFT]:
-                self.alter_end(cell, self.sp)
-            elif click[0] and not keys[pg.K_LSHIFT]:
-                self.add_walls(cell, self.sp)
-            elif click[2] and not keys[pg.K_LSHIFT]:
-                self.remove_walls(cell, self.sp)
-            elif event.type == pg.MOUSEBUTTONDOWN and event.button == 2:
-                self.sp.print_info()
+            if not self.slider.dragging:
+                if click[0] and keys[pg.K_LSHIFT]:
+                    self.alter_start(cell, self.sp)
+                elif click[2] and keys[pg.K_LSHIFT]:
+                    self.alter_end(cell, self.sp)
+                elif click[0] and not keys[pg.K_LSHIFT]:
+                    self.add_walls(cell, self.sp)
+                elif click[2] and not keys[pg.K_LSHIFT]:
+                    self.remove_walls(cell, self.sp)
+                elif event.type == pg.MOUSEBUTTONDOWN and event.button == 2:
+                    self.sp.print_info()
 
     def update(self):
         """
         Game Loop - Update
         :return:
         """
-        self.debug_text = str(self.slider.get_value())
         self.all_sprites.update()
         self.sp.calculate_path()
-        self.update_colors(self.grid, self.sp)
+        self.update_colors(self)
+        self.update_text(self)
         self.slider.update()
 
     def draw(self):
@@ -96,10 +101,12 @@ class UI(_ui.Mixin):
         :return:
         """
         self.screen.fill((255, 255, 255))
-        self.grid.draw(self.screen, self.draw_surface, self.slider.get_value())
+        self.grid.draw(self.screen, self.draw_surface, self.slider.get_value(), self.switch.is_on())
         self.screen.blit(self.draw_surface, (0, 0))
         self.slider.draw(self.screen)
-        self.draw_text(self.screen, self.debug_text, BLACK, 650, 75)
+        self.switch.draw(self.screen)
+        for surface, text, color, x, y in self.text_widgets:
+            self.draw_text(surface, text, color, (x, y))
         self.all_sprites.draw(self.screen)
         # always do last after drawing everything
         pg.display.flip()

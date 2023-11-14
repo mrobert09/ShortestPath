@@ -64,7 +64,7 @@ class Grid:
                      (self.board_width + self.x_offset, self.board_height + self.y_offset))
 
 
-    def color_cells(self, screen):
+    def color_cells(self, screen, draw_path):
         def paint(cell_, color_):
             g_pos = self.global_pos(cell_)
             if g_pos:
@@ -82,15 +82,17 @@ class Grid:
             else:
                 if type(self.cell_colors[color]) is set:
                     for cell in self.cell_colors[color]:
+                        if color == YELLOW and not draw_path:  # skips drawing path if switch is off
+                            continue
                         paint(cell, color)
 
-    def draw(self, screen, draw_surface, alpha):
+    def draw(self, screen, draw_surface, alpha, draw_path):
         """
         Draws the grid elements onto the surface.
         :param screen: PyGame surface
         :return: None
         """
-        self.color_cells(screen)
+        self.color_cells(screen, draw_path)
         self.draw_lines(draw_surface, alpha)
 
 

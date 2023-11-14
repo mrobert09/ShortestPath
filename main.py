@@ -15,13 +15,17 @@ class ShortestPath:
         self.calculate_path()
 
     def update_cell(self, cell_type, cell):
+        """
+        Method for changing cell type between empty, start, end, and wall
+        :param cell_type: string ("start", "end", "add", "remove")
+        :param cell: tuple (x, y)
+        :return: None
+        """
         match cell_type:
             case "start":
                 self.start = cell
-                # self.blocked_points.discard(cell)
             case "end":
                 self.end = cell
-                # self.blocked_points.discard(cell)
             case "add":
                 if cell != self.start and cell != self.end:
                     self.blocked_points.add(cell)
@@ -31,6 +35,12 @@ class ShortestPath:
                 return
 
     def find_adjacent(self, point, adjacent_points):
+        """
+        Method for adding adjacent cells to queue. Modifies adjacent_points directly.
+        :param point: tuple (x, y)
+        :param adjacent_points: Simple Queue
+        :return: None
+        """
         for x in range(-1, 2):
             for y in range(-1, 2):
                 next_point = ((point[0] + x), (point[1] + y))

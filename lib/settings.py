@@ -2,7 +2,7 @@
 TITLE = "Chess"
 WIDTH = 800
 HEIGHT = 600
-FPS = 60
+FPS = 240
 FONT_NAME = "Arial"
 FONT_SIZE = 20
 
