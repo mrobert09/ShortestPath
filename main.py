@@ -90,7 +90,7 @@ class ShortestPath:
             point, prev_point, distance = adjacent_points.get()
             prev_point_distance = self.path_dict[prev_point][1]
             if point not in self.path_dict.keys():
-                # p_dict[point] = [point coming from, distance distance from start]
+                # p_dict[point] = [point coming from, distance from start]
                 self.path_dict[point] = [prev_point, distance + prev_point_distance]
                 self.find_adjacent(point, adjacent_points)
             else:
