@@ -74,13 +74,13 @@ class UI(_ui.Mixin):
             cell = self.grid.get_cell(pos)
             if not self.slider.dragging:
                 if click[0] and keys[pg.K_LSHIFT]:
-                    self.alter_start(cell, self.sp)
+                    self.alter_start(cell, self.sp, self.switch.is_on())
                 elif click[2] and keys[pg.K_LSHIFT]:
-                    self.alter_end(cell, self.sp)
+                    self.alter_end(cell, self.sp, self.switch.is_on())
                 elif click[0] and not keys[pg.K_LSHIFT]:
-                    self.add_walls(cell, self.sp)
+                    self.add_walls(cell, self.sp, self.switch.is_on())
                 elif click[2] and not keys[pg.K_LSHIFT]:
-                    self.remove_walls(cell, self.sp)
+                    self.remove_walls(cell, self.sp, self.switch.is_on())
                 elif event.type == pg.MOUSEBUTTONDOWN and event.button == 2:
                     self.sp.print_info()
 

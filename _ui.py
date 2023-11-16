@@ -4,50 +4,58 @@ from lib.settings import *
 
 class Mixin:
     @staticmethod
-    def alter_start(cell, path):
+    def alter_start(cell, path, show_path):
         """
         Static method used for updating starting cell location.
         :param cell: tuple
         :param path: ShortestPath algorithm
+        :param show_path: Bool - True if yellow path is turned on, False if not
         :return: None
         """
         if cell and cell not in path.blocked_points:
             path.update_cell("start", cell)
-            path.calculate_path()
+            if show_path:
+                path.calculate_path()
 
     @staticmethod
-    def alter_end(cell, path):
+    def alter_end(cell, path, show_path):
         """
         Static method used for updating ending cell location.
         :param cell: tuple
         :param path: ShortestPath algorithm
+        :param show_path: Bool - True if yellow path is turned on, False if not
         :return: None
         """
         if cell and cell not in path.blocked_points:
             path.update_cell("end", cell)
-            path.find_path(cell)
+            if show_path:
+                path.find_path(cell)
 
     @staticmethod
-    def add_walls(cell, path):
+    def add_walls(cell, path, show_path):
         """
         Static method used for adding cells as walls.
         :param cell: tuple
         :param path: ShortestPath algorithm
+        :param show_path: Bool - True if yellow path is turned on, False if not
         :return: None
         """
         path.update_cell("add", cell)
-        path.calculate_path()
+        if show_path:
+            path.calculate_path()
 
     @staticmethod
-    def remove_walls(cell, path):
+    def remove_walls(cell, path, show_path):
         """
         Static method used for removing cells as walls.
         :param cell: tuple
         :param path: ShortestPath algorithm
+        :param show_path: Bool - True if yellow path is turned on, False if not
         :return: None
         """
         path.update_cell("remove", cell)
-        path.calculate_path()
+        if show_path:
+            path.calculate_path()
 
     @staticmethod
     def update_colors(app):
