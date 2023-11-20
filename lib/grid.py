@@ -65,6 +65,12 @@ class Grid:
 
 
     def color_cells(self, screen, draw_path):
+        """
+        Paints the cells different colors based on their role in the grid.
+        :param screen: PyGame surface
+        :param draw_path: Shortest path from start to end
+        :return: None
+        """
         def paint(cell_, color_):
             g_pos = self.global_pos(cell_)
             if g_pos:
@@ -77,14 +83,10 @@ class Grid:
                 screen.blit(surface, (x, y))
 
         for color in self.cell_colors:
-            if type(self.cell_colors[color]) is tuple:
-                paint(self.cell_colors[color], color)
-            else:
-                if type(self.cell_colors[color]) is set:
-                    for cell in self.cell_colors[color]:
-                        if color == YELLOW and not draw_path:  # skips drawing path if switch is off
-                            continue
-                        paint(cell, color)
+            for cell in self.cell_colors[color]:
+                if color == YELLOW and not draw_path:  # skips drawing path if switch is off
+                    continue
+                paint(cell, color)
 
     def draw(self, screen, draw_surface, alpha, draw_path):
         """

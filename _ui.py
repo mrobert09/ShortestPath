@@ -65,8 +65,8 @@ class Mixin:
         :return: None
         """
         app.grid.cell_colors[YELLOW] = app.sp.path
-        app.grid.cell_colors[GREEN] = app.sp.start
-        app.grid.cell_colors[RED] = app.sp.end
+        app.grid.cell_colors[GREEN] = {app.sp.start}
+        app.grid.cell_colors[RED] = {app.sp.end}
         app.grid.cell_colors[BLACK] = app.sp.blocked_points
 
     @staticmethod
