@@ -29,7 +29,7 @@ class Mixin:
         if cell and cell not in path.blocked_points:
             path.update_cell("end", cell)
             if show_path:
-                path.find_path(cell)
+                path.calculate_path()
 
     @staticmethod
     def add_walls(cell, path, show_path):
