@@ -3,7 +3,7 @@ import pygame as pg
 
 class Slider:
     """
-    Slider module for PyGame. Adds a horizontal slider to the screen at position (x, y) with user defined length.
+    Slider module for PyGame. Adds a horizontal alpha_slider to the screen at position (x, y) with user defined length.
 
     Has default attributes of a minimum value of 0, max value of 100, and initial value of 0.
     """
@@ -29,7 +29,7 @@ class Slider:
 
     def draw(self, screen):
         """
-        Method for drawing the slider to the screen each frame.
+        Method for drawing the alpha_slider to the screen each frame.
         :param screen: PyGame surface
         :return: None
         """
@@ -40,7 +40,7 @@ class Slider:
 
     def handle_event(self, event):
         """
-        Event handler for slider specific interactions.
+        Event handler for alpha_slider specific interactions.
         :param event: PyGame event
         :return: None
         """
@@ -54,7 +54,7 @@ class Slider:
 
     def update(self):
         """
-        Updates the location of the handle on the slider each frame.
+        Updates the location of the handle on the alpha_slider each frame.
         :return: None
         """
         if self.dragging:
@@ -65,7 +65,7 @@ class Slider:
 
     def get_value(self):
         """
-        Get method for retrieving the current value of the slider based on handle position.
+        Get method for retrieving the current value of the alpha_slider based on handle position.
         :return:
         """
         # Calculate the proportional position of the handle
@@ -79,7 +79,7 @@ class Slider:
 
     class InvalidMinMax(Exception):
         """
-        Exception raised if minimum value for slider is greater than the maximum value.
+        Exception raised if minimum value for alpha_slider is greater than the maximum value.
         """
         def __init__(self):
             super().__init__("Minimum value must be less than maximum value.")

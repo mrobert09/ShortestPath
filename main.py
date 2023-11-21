@@ -10,10 +10,10 @@ class ShortestPath:
         self.width = width
         self.height = height
         self.blocked_points = set()
+        self.queued_points = []
         self.distance = None
         self.path = set()
         self.dijkstra = Dijkstra(self)
-        self.calculate_path()
 
     def update_cell(self, cell_type, cell):
         """
@@ -45,6 +45,13 @@ class ShortestPath:
         end_time = time.perf_counter()
         print("Calculation time:", end_time - start_time)
 
+    def calculate_path_with_ticks(self, tick_rate):
+        # start_time = time.perf_counter()
+        self.dijkstra.tick(tick_rate)
+        self.distance, self.path = self.dijkstra.public_find_path() or (None, None)
+        # end_time = time.perf_counter()
+        # print("Calculation time:", end_time - start_time)
+
     def print_info(self):
         """
         Used mostly for debugging. Prints some useful info to the console.
@@ -72,6 +79,7 @@ def main():
     ending_point = (2, 2)
 
     sp = ShortestPath(starting_point, ending_point, max_grid_x, max_grid_y)
+    sp.calculate_path()
     print(sp)
 
 

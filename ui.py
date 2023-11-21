@@ -22,11 +22,14 @@ class UI(_ui.Mixin):
         self.draw_surface = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
         self.sp = ShortestPath((0, 0), (TILEWIDTH - 1, TILEHEIGHT-1), TILEWIDTH, TILEHEIGHT)
         self.grid = Grid(TILESIZE, (TILEWIDTH, TILEHEIGHT), (X_OFFSET, Y_OFFSET))
-        self.slider = Slider((600, 50), 150, 0, 255, initial_value=255)
-        self.slider_drag = False
-        self.switch = Switch((625, 90), 100, 25)
+        self.alpha_slider = Slider((600, 50), 150, 0, 255, initial_value=255)
+        # self.alpha_slider_drag = False  # probably not needed, clear soon
+        self.tick_slider = Slider((600, 180), 150, 0, 100, initial_value=100)
+        # self.tick_slider_drag = False  # probably not needed, clear soon
+        self.switch = Switch((625, 100), 100, 25)
         self.text_widgets = []
         self.all_sprites = pg.sprite.Group()
+        self.route_freeze = False
         self.playing = True
         self.running = True
 
@@ -46,7 +49,7 @@ class UI(_ui.Mixin):
         # self.grid.add_cell_color((0, 0), GREEN, 1)
         # self.grid.add_cell_color((TILEWIDTH - 1, TILEHEIGHT - 1), RED, 1)
         while self.playing:
-            self.clock.tick(1000)
+            self.clock.tick(60)
             self.events()
             self.update()
             self.draw()
@@ -67,32 +70,49 @@ class UI(_ui.Mixin):
             keys = pg.key.get_pressed()
             click = pg.mouse.get_pressed(3)
 
-            self.slider.handle_event(event)
+            self.alpha_slider.handle_event(event)
             self.switch.handle_event(event)
+            self.tick_slider.handle_event(event)
 
             # Grid event logic
             cell = self.grid.get_cell(pos)
-            if not self.slider.dragging:
+            if not (self.alpha_slider.dragging or self.tick_slider.dragging):
                 if click[0] and keys[pg.K_LSHIFT]:
-                    self.alter_start(cell, self.sp, self.switch.is_on())
+                    if cell and self.tick_slider.get_value() < 100:
+                        self.route_freeze = True
+                    self.alter_start(cell, self.sp, self.switch.is_on(), self.tick_slider.get_value())
                 elif click[2] and keys[pg.K_LSHIFT]:
-                    self.alter_end(cell, self.sp, self.switch.is_on())
+                    if cell and self.tick_slider.get_value() < 100:
+                        self.route_freeze = True
+                    self.alter_end(cell, self.sp, self.switch.is_on(), self.tick_slider.get_value())
                 elif click[0] and not keys[pg.K_LSHIFT]:
-                    self.add_walls(cell, self.sp, self.switch.is_on())
+                    if cell and self.tick_slider.get_value() < 100:
+                        self.route_freeze = True
+                    self.add_walls(cell, self.sp, self.switch.is_on(), self.tick_slider.get_value())
                 elif click[2] and not keys[pg.K_LSHIFT]:
-                    self.remove_walls(cell, self.sp, self.switch.is_on())
+                    if cell and self.tick_slider.get_value() < 100:
+                        self.route_freeze = True
+                    self.remove_walls(cell, self.sp, self.switch.is_on(), self.tick_slider.get_value())
                 elif event.type == pg.MOUSEBUTTONDOWN and event.button == 2:
                     self.sp.print_info()
+                elif event.type == pg.MOUSEBUTTONUP and (event.button == 1 or event.button == 3):
+                    self.route_freeze = False
 
     def update(self):
         """
         Game Loop - Update
         :return:
         """
+        if self.tick_slider.get_value() < 100:
+            if not self.route_freeze:
+                self.sp.calculate_path_with_ticks(self.tick_slider.get_value())
+        else:
+            self.sp.calculate_path_with_ticks(100000)
         self.all_sprites.update()
         self.update_colors(self)
         self.update_text(self)
-        self.slider.update()
+        self.alpha_slider.update()
+        self.tick_slider.update()
 
     def draw(self):
         """
@@ -100,9 +120,10 @@ class UI(_ui.Mixin):
         :return:
         """
         self.screen.fill((255, 255, 255))
-        self.grid.draw(self.screen, self.draw_surface, self.slider.get_value(), self.switch.is_on())
+        self.grid.draw(self.screen, self.draw_surface, self.alpha_slider.get_value(), self.switch.is_on())
         self.screen.blit(self.draw_surface, (0, 0))
-        self.slider.draw(self.screen)
+        self.alpha_slider.draw(self.screen)
+        self.tick_slider.draw(self.screen)
         self.switch.draw(self.screen)
         for surface, text, color, x, y in self.text_widgets:
             self.draw_text(surface, text, color, (x, y))

@@ -14,6 +14,7 @@ class Dijkstra:
     def __init__(self, graph):
         self.__graph = graph
         self.__path_dict = {}
+        self.__neighbors = SimpleQueue()
 
     def __find_neighbors(self, point, neighbors):
         """
@@ -31,6 +32,7 @@ class Dijkstra:
                         if not self.__check_corner_move(point, next_point):
                             return
                     neighbors.put([next_point, point, dist(next_point, point)])
+                    self.__graph.queued_points.append(next_point)
 
     def __check_corner_move(self, point, next_point):
         """
@@ -113,3 +115,45 @@ class Dijkstra:
         """
         self.__generate_path_dictionary()
         return self.__find_path(self.__graph.end)
+
+    def clear_path_dict(self):
+        self.__path_dict.clear()
+
+    def public_find_path(self):
+        if len(self.__path_dict) > 0 and self.__neighbors.empty():
+            return self.__find_path(self.__graph.end)
+
+    def tick(self, tick_rate, end_point=None):
+        """
+        Calculates the Dijkstra algorithm and returns the path.
+        :return: (Distance: int, Path: set) or (None, None)
+        """
+        if len(self.__path_dict) == 0:
+            self.__neighbors = SimpleQueue()
+            self.__graph.queued_points.clear()
+
+            # Fill in blocked spaces
+            for point in self.__graph.blocked_points:
+                self.__path_dict[point] = None
+
+            # Starting cell sets "previous cell" to itself with a distance of 0
+            self.__path_dict[self.__graph.start] = [self.__graph.start, 0.0]
+            self.__find_neighbors(self.__graph.start, self.__neighbors)
+
+        while tick_rate > 0:
+            tick_rate -= 1
+
+            if not self.__neighbors.empty():
+                point, prev_point, distance = self.__neighbors.get()
+                self.__graph.queued_points.remove(point)
+                prev_point_distance = self.__path_dict[prev_point][1]
+                if point not in self.__path_dict.keys():
+                    # p_dict[point] = [point coming from, distance from start]
+                    self.__path_dict[point] = [prev_point, distance + prev_point_distance]
+                    self.__find_neighbors(point, self.__neighbors)
+                else:
+                    known_distance = self.__path_dict[point][1]
+                    # Check if new distance to point is less than already known distance. If so, update.
+                    if distance + prev_point_distance < known_distance:
+                        self.__path_dict[point] = [prev_point, distance + prev_point_distance]
+                        self.__find_neighbors(point, self.__neighbors)

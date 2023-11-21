@@ -4,7 +4,7 @@ from lib.settings import *
 
 class Mixin:
     @staticmethod
-    def alter_start(cell, path, show_path):
+    def alter_start(cell, path, show_path, tick_rate):
         """
         Static method used for updating starting cell location.
         :param cell: tuple
@@ -13,13 +13,11 @@ class Mixin:
         :return: None
         """
         if cell and cell not in path.blocked_points:
-            print("in grid")
             path.update_cell("start", cell)
-            if show_path:
-                path.calculate_path()
+            path.dijkstra.clear_path_dict()
 
     @staticmethod
-    def alter_end(cell, path, show_path):
+    def alter_end(cell, path, show_path, tick_rate):
         """
         Static method used for updating ending cell location.
         :param cell: tuple
@@ -29,11 +27,10 @@ class Mixin:
         """
         if cell and cell not in path.blocked_points:
             path.update_cell("end", cell)
-            if show_path:
-                path.calculate_path()
+            path.dijkstra.clear_path_dict()
 
     @staticmethod
-    def add_walls(cell, path, show_path):
+    def add_walls(cell, path, show_path, tick_rate):
         """
         Static method used for adding cells as walls.
         :param cell: tuple
@@ -41,13 +38,12 @@ class Mixin:
         :param show_path: Bool - True if yellow path is turned on, False if not
         :return: None
         """
-        # if cell:
-        path.update_cell("add", cell)
-        if show_path:
-            path.calculate_path()
+        if cell and cell not in path.blocked_points:
+            path.update_cell("add", cell)
+            path.dijkstra.clear_path_dict()
 
     @staticmethod
-    def remove_walls(cell, path, show_path):
+    def remove_walls(cell, path, show_path, tick_rate):
         """
         Static method used for removing cells as walls.
         :param cell: tuple
@@ -55,9 +51,9 @@ class Mixin:
         :param show_path: Bool - True if yellow path is turned on, False if not
         :return: None
         """
-        path.update_cell("remove", cell)
-        if show_path:
-            path.calculate_path()
+        if cell and cell in path.blocked_points:
+            path.update_cell("remove", cell)
+            path.dijkstra.clear_path_dict()
 
     @staticmethod
     def update_colors(app):
@@ -70,6 +66,7 @@ class Mixin:
         app.grid.cell_colors[GREEN] = {app.sp.start}
         app.grid.cell_colors[RED] = {app.sp.end}
         app.grid.cell_colors[BLACK] = app.sp.blocked_points
+        app.grid.cell_colors[BLUE] = set(app.sp.queued_points)
 
     @staticmethod
     def update_text(app):
@@ -79,10 +76,15 @@ class Mixin:
         :return: None
         """
         text_widgets = []
-        text_widgets.append((app.screen, "Grid Alpha", BLACK, 640, 20))
-        # text_widgets.append((app.screen, str(app.slider.get_value()), BLACK, 665, 60))
-        text_widgets.append((app.screen, "Display Path", BLACK, 628, 120))
+        text_widgets.append((app.screen, "Grid Alpha", BLACK, 640, 10))
+        # text_widgets.append((app.screen, str(app.alpha_slider.get_value()), BLACK, 665, 60))
+        text_widgets.append((app.screen, "Display Path", BLACK, 628, 70))
         # text_widgets.append((app.screen, str(app.switch.is_on()), BLACK, 630, 150))
+        text_widgets.append((app.screen, "Algorithm Tick Rate", BLACK, 610, 140))
+        if app.tick_slider.get_value() < 100:
+            text_widgets.append((app.screen, str(app.tick_slider.get_value()), BLACK, 670, 190))
+        else:
+            text_widgets.append((app.screen, str('Instant'), BLACK, 655, 190))
 
         app.text_widgets = text_widgets
 
