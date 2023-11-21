@@ -13,6 +13,7 @@ class Mixin:
         :return: None
         """
         if cell and cell not in path.blocked_points:
+            print("in grid")
             path.update_cell("start", cell)
             if show_path:
                 path.calculate_path()
@@ -40,6 +41,7 @@ class Mixin:
         :param show_path: Bool - True if yellow path is turned on, False if not
         :return: None
         """
+        # if cell:
         path.update_cell("add", cell)
         if show_path:
             path.calculate_path()
@@ -64,7 +66,7 @@ class Mixin:
         :param app: Main UI instance
         :return: None
         """
-        app.grid.cell_colors[YELLOW] = app.sp.path
+        app.grid.cell_colors[YELLOW] = app.sp.path or set()  # needed as algorithm might return None
         app.grid.cell_colors[GREEN] = {app.sp.start}
         app.grid.cell_colors[RED] = {app.sp.end}
         app.grid.cell_colors[BLACK] = app.sp.blocked_points
