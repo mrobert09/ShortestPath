@@ -121,6 +121,7 @@ class Dijkstra:
 
     def public_find_path(self):
         if len(self.__path_dict) > 0 and self.__neighbors.empty():
+            self.__graph.checking_cell = None
             return self.__find_path(self.__graph.end)
 
     def tick(self, tick_rate, end_point=None):
@@ -145,6 +146,7 @@ class Dijkstra:
 
             if not self.__neighbors.empty():
                 point, prev_point, distance = self.__neighbors.get()
+                self.__graph.checking_cell = point
                 self.__graph.queued_points.remove(point)
                 prev_point_distance = self.__path_dict[prev_point][1]
                 if point not in self.__path_dict.keys():

@@ -67,6 +67,7 @@ class Mixin:
         app.grid.cell_colors[RED] = {app.sp.end}
         app.grid.cell_colors[BLACK] = app.sp.blocked_points
         app.grid.cell_colors[BLUE] = set(app.sp.queued_points)
+        app.grid.cell_colors[PINK] = {app.sp.checking_cell}
 
     @staticmethod
     def update_text(app):

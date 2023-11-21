@@ -11,6 +11,7 @@ class ShortestPath:
         self.height = height
         self.blocked_points = set()
         self.queued_points = []
+        self.checking_cell = None
         self.distance = None
         self.path = set()
         self.dijkstra = Dijkstra(self)
