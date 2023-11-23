@@ -4,37 +4,40 @@ from queue import SimpleQueue
 
 class BFS:
     """
-    Simple take on BFS algorithm. Takes a graph object that requires the following data members:
-    self.start = Starting cell : tuple,
-    self.end = Ending cell : tuple,
-    self.width = Width of graph : int,
-    self.height = Height of graph : int,
-    self.blocked_points = Unusable cells : set(tuple)
+    Simple take on BFS algorithm.
+    :param width: int - Width of grid
+    :param height: int - Height of grid
     """
-    def __init__(self, graph):
+    def __init__(self, width, height):
         self.__came_from = {}  # __came_from[point] = [point coming from, distance from start]
         self.__neighbors = SimpleQueue()
+        self.width = width
+        self.height = height
         self.count = 0
+        self.checking_cell = None
+        self.queued_cells = []
 
-        self.__graph = graph  # goal to remove the need for this
-
-    def tick(self, tick_rate):
+    def tick(self, tick_rate, start, blocked_points):
         """
-        Calculates the BFS algorithm and returns the path.
-        :return: (Distance: int, Path: set) or (None, None)
+        Calculates the shortest route to every cell in a grid from a starting location.
+        Runs algorithm in chunks moderated by tick rate.
+        :param tick_rate: int || number of calculations per frame
+        :param start: tuple || starting cell
+        :param blocked_points: list(tuples) || list of cells that are walls
+        :return:
         """
         if len(self.__came_from) == 0:
             # Reset data
             self.__neighbors = SimpleQueue()
-            self.__graph.queued_points.clear()
+            self.queued_cells.clear()
 
             # Fill in blocked spaces
-            for point in self.__graph.blocked_points:
+            for point in blocked_points:
                 self.__came_from[point] = None
 
             # Starting cell sets "previous cell" to itself with a distance of 0
-            self.__came_from[self.__graph.start] = [self.__graph.start, 0.0]
-            self.__find_neighbors(self.__graph.start)
+            self.__came_from[start] = [start, 0.0]
+            self.__find_neighbors(start, blocked_points)
 
         while tick_rate > 0:
             self.count = max(self.count, self.__neighbors.qsize())
@@ -43,54 +46,61 @@ class BFS:
 
             if not self.__neighbors.empty():
                 cell, prev_cell, distance = self.__neighbors.get()
-                self.__graph.checking_cell = cell
-                self.__graph.queued_points.remove(cell)
+                self.checking_cell = cell
+                self.queued_cells.remove(cell)
                 prev_cell_distance = self.__came_from[prev_cell][1]  # distance connected cell is from start
                 if cell not in self.__came_from.keys():
                     self.__came_from[cell] = [prev_cell, distance + prev_cell_distance]  # running total of distance
-                    self.__find_neighbors(cell)
+                    self.__find_neighbors(cell, blocked_points)
                 else:
                     known_distance = self.__came_from[cell][1]
 
                     # Check if new distance to point is less than already known distance. If so, update.
                     if distance + prev_cell_distance < known_distance:
                         self.__came_from[cell] = [prev_cell, distance + prev_cell_distance]
-                        self.__find_neighbors(cell)
+                        self.__find_neighbors(cell, blocked_points)
 
-    def __find_neighbors(self, point):
+    def __find_neighbors(self, point, blocked_points):
         """
         Method for adding adjacent cells to queue. Modifies adjacent_points directly.
-        :param point: tuple (x, y)
+        :param point: tuple || (x, y)
+        :param blocked_points: list(tuples) || list of cells that are walls
         :return: None
         """
         for x in range(-1, 2):
             for y in range(-1, 2):
                 next_point = ((point[0] + x), (point[1] + y))
-                if (self.__graph.width > point[0] + x >= 0 and self.__graph.height > point[1] + y >= 0 and
+                if (self.width > point[0] + x >= 0 and self.height > point[1] + y >= 0 and
                         next_point not in self.__came_from and next_point != point):
                     if dist(next_point, point) > 1:
-                        if not self.__check_corner_move(point, next_point):
+                        if not self.__check_corner_move(point, next_point, blocked_points):
                             return
                     self.__neighbors.put([next_point, point, dist(next_point, point)])
-                    self.__graph.queued_points.append(next_point)
+                    self.queued_cells.append(next_point)
 
-    def __check_corner_move(self, point, next_point):
+    def __check_corner_move(self, point, next_point, blocked_points):
         """
         Helper method for find_adjacent to verify if a diagonal movement is legal.
-        :param point: tuple (x, y) origination point
-        :param next_point: tuple (x, y) destination point
+        :param point: tuple || (x, y) origination point
+        :param next_point: tuple || (x, y) destination point
+        :param blocked_points: list(tuples) || list of cells that are walls
         :return: True if legal move, False otherwise
         """
         x1, y1 = point
         x2, y2 = next_point
-        if (x1, y2) in self.__graph.blocked_points and (x2, y1) in self.__graph.blocked_points:
+        if (x1, y2) in blocked_points and (x2, y1) in blocked_points:
             return False
         return True
 
-    def public_find_path(self):
+    def public_find_path(self, end):
+        """
+        Public access to generating a path from starting cell to ending cell.
+        :param end: tuple || (x, y) ending cell: tuple
+        :return: (Distance: int, Path: set) or (None, None)
+        """
         if len(self.__came_from) > 0 and self.__neighbors.empty():
-            self.__graph.checking_cell = None
-            return self.__find_path(self.__graph.end)
+            self.checking_cell = None
+            return self.__find_path(end)
 
     def __find_path(self, end_point, path=None, distance=0):
         """
@@ -120,6 +130,7 @@ class BFS:
 
     def clear_came_from_dict(self):
         """
+        Clears self.__came_from dictionary.
         :return:
         """
         self.__came_from.clear()

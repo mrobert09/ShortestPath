@@ -10,11 +10,9 @@ class ShortestPath:
         self.width = width
         self.height = height
         self.blocked_points = set()
-        self.queued_points = []
-        self.checking_cell = None
         self.distance = None
         self.path = set()
-        self.dijkstra = BFS(self)
+        self.bfs = BFS(width, height)
 
     def update_cell(self, cell_type, cell):
         """
@@ -44,15 +42,15 @@ class ShortestPath:
     #     times = 0
     #     for x in range(100):
     #         start_time = time.perf_counter()
-    #         self.distance, self.path = self.dijkstra.calculate()
+    #         self.distance, self.path = self.bfs.calculate()
     #         end_time = time.perf_counter()
     #         times += (end_time - start_time)
     #     print("Calculation time:", times/100)
 
     def calculate_path_with_ticks(self, tick_rate):
         # start_time = time.perf_counter()
-        self.dijkstra.tick(tick_rate)
-        self.distance, self.path = self.dijkstra.public_find_path() or (None, None)
+        self.bfs.tick(tick_rate, self.start, self.blocked_points)
+        self.distance, self.path = self.bfs.public_find_path(self.end) or (None, None)
         # end_time = time.perf_counter()
         # print("Calculation time:", end_time - start_time)
 
@@ -92,7 +90,7 @@ def main():
         sp.calculate_path_with_ticks(1000)
         end_time = time.perf_counter()
         times += (end_time - start_time)
-        # print(sp.dijkstra.count)
+        # print(sp.bfs.count)
     print("Calc:", times / 10)
     # print(sp)
 

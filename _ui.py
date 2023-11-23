@@ -14,7 +14,7 @@ class Mixin:
         """
         if cell and cell not in path.blocked_points:
             path.update_cell("start", cell)
-            path.dijkstra.clear_came_from_dict()
+            path.bfs.clear_came_from_dict()
 
     @staticmethod
     def alter_end(cell, path, show_path, tick_rate):
@@ -27,7 +27,7 @@ class Mixin:
         """
         if cell and cell not in path.blocked_points:
             path.update_cell("end", cell)
-            path.dijkstra.clear_came_from_dict()
+            path.bfs.clear_came_from_dict()
 
     @staticmethod
     def add_walls(cell, path, show_path, tick_rate):
@@ -40,7 +40,7 @@ class Mixin:
         """
         if cell and cell not in path.blocked_points:
             path.update_cell("add", cell)
-            path.dijkstra.clear_came_from_dict()
+            path.bfs.clear_came_from_dict()
 
     @staticmethod
     def remove_walls(cell, path, show_path, tick_rate):
@@ -53,7 +53,7 @@ class Mixin:
         """
         if cell and cell in path.blocked_points:
             path.update_cell("remove", cell)
-            path.dijkstra.clear_came_from_dict()
+            path.bfs.clear_came_from_dict()
 
     @staticmethod
     def update_colors(app):
@@ -66,8 +66,8 @@ class Mixin:
         app.grid.cell_colors[GREEN] = {app.sp.start}
         app.grid.cell_colors[RED] = {app.sp.end}
         app.grid.cell_colors[BLACK] = app.sp.blocked_points
-        app.grid.cell_colors[BLUE] = set(app.sp.queued_points)
-        app.grid.cell_colors[PINK] = {app.sp.checking_cell}
+        app.grid.cell_colors[BLUE] = set(app.sp.bfs.queued_cells)
+        app.grid.cell_colors[PINK] = {app.sp.bfs.checking_cell}
 
     @staticmethod
     def update_text(app):
