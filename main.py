@@ -1,4 +1,4 @@
-from lib.djikstra import Dijkstra
+from lib.bfs import BFS
 import time
 
 
@@ -14,7 +14,7 @@ class ShortestPath:
         self.checking_cell = None
         self.distance = None
         self.path = set()
-        self.dijkstra = Dijkstra(self)
+        self.dijkstra = BFS(self)
 
     def update_cell(self, cell_type, cell):
         """
@@ -36,15 +36,18 @@ class ShortestPath:
             case _:
                 return
 
-    def calculate_path(self):
-        """
-        Simple container for calling path functions.
-        :return: None
-        """
-        start_time = time.perf_counter()
-        self.distance, self.path = self.dijkstra.calculate()
-        end_time = time.perf_counter()
-        print("Calculation time:", end_time - start_time)
+    # def calculate_path(self):
+    #     """
+    #     Simple container for calling path functions.
+    #     :return: None
+    #     """
+    #     times = 0
+    #     for x in range(100):
+    #         start_time = time.perf_counter()
+    #         self.distance, self.path = self.dijkstra.calculate()
+    #         end_time = time.perf_counter()
+    #         times += (end_time - start_time)
+    #     print("Calculation time:", times/100)
 
     def calculate_path_with_ticks(self, tick_rate):
         # start_time = time.perf_counter()
@@ -67,21 +70,31 @@ class ShortestPath:
         """
         if self.path:
             s = "Start: " + str(self.start) + "\nEnd: " + str(self.end) + \
-                "\nDistance: " + str(self.distance) + "\nPath: " + str(self.path)
+                "\nDistance: " + str(self.distance) + "\nPath: " + str(self.path) + \
+                "\nBlocked Cells: " + str(self.blocked_points)
             return s
         else:
             return "No valid path to end."
 
 
 def main():
-    max_grid_x = 3
-    max_grid_y = 3
+
+    max_grid_x = 50
+    max_grid_y = 50
     starting_point = (0, 0)
     ending_point = (2, 2)
 
-    sp = ShortestPath(starting_point, ending_point, max_grid_x, max_grid_y)
-    sp.calculate_path()
-    print(sp)
+    times = 0
+    for x in range(10):
+        sp = ShortestPath(starting_point, ending_point, max_grid_x, max_grid_y)
+
+        start_time = time.perf_counter()
+        sp.calculate_path_with_ticks(1000)
+        end_time = time.perf_counter()
+        times += (end_time - start_time)
+        # print(sp.dijkstra.count)
+    print("Calc:", times / 10)
+    # print(sp)
 
 
 if __name__ == '__main__':

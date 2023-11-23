@@ -14,7 +14,7 @@ class Mixin:
         """
         if cell and cell not in path.blocked_points:
             path.update_cell("start", cell)
-            path.dijkstra.clear_path_dict()
+            path.dijkstra.clear_came_from_dict()
 
     @staticmethod
     def alter_end(cell, path, show_path, tick_rate):
@@ -27,7 +27,7 @@ class Mixin:
         """
         if cell and cell not in path.blocked_points:
             path.update_cell("end", cell)
-            path.dijkstra.clear_path_dict()
+            path.dijkstra.clear_came_from_dict()
 
     @staticmethod
     def add_walls(cell, path, show_path, tick_rate):
@@ -40,7 +40,7 @@ class Mixin:
         """
         if cell and cell not in path.blocked_points:
             path.update_cell("add", cell)
-            path.dijkstra.clear_path_dict()
+            path.dijkstra.clear_came_from_dict()
 
     @staticmethod
     def remove_walls(cell, path, show_path, tick_rate):
@@ -53,7 +53,7 @@ class Mixin:
         """
         if cell and cell in path.blocked_points:
             path.update_cell("remove", cell)
-            path.dijkstra.clear_path_dict()
+            path.dijkstra.clear_came_from_dict()
 
     @staticmethod
     def update_colors(app):
