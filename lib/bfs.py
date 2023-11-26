@@ -16,13 +16,15 @@ class BFS:
         self.count = 0
         self.checking_cell = None
         self.queued_cells = []
+        self.target_found = False
 
-    def tick(self, tick_rate, start, blocked_points):
+    def tick(self, tick_rate, start, end, blocked_points):
         """
         Calculates the shortest route to every cell in a grid from a starting location.
-        Runs algorithm in chunks moderated by tick rate.
+        Runs algorithm in chunks moderated by tick rate. Allows for early exit.
         :param tick_rate: int || number of calculations per frame
         :param start: tuple || starting cell
+        :param end: tuple || ending cell
         :param blocked_points: list(tuples) || list of cells that are walls
         :return:
         """
@@ -30,6 +32,7 @@ class BFS:
             # Reset data
             self.__neighbors = SimpleQueue()
             self.queued_cells.clear()
+            self.target_found = False
 
             # Fill in blocked spaces
             for point in blocked_points:
@@ -37,33 +40,38 @@ class BFS:
 
             # Starting cell sets "previous cell" to itself with a distance of 0
             self.__came_from[start] = [start, 0.0]
-            self.__find_neighbors(start, blocked_points)
+            self.__find_neighbors(start, end, blocked_points)
 
         while tick_rate > 0:
             self.count = max(self.count, self.__neighbors.qsize())
             # print(self.count)
             tick_rate -= 1
+            if self.target_found and self.queued_cells.count(end) == 0:
+                self.queued_cells.clear()
+                self.checking_cell = None
 
-            if not self.__neighbors.empty():
+            elif not self.__neighbors.empty():
                 cell, prev_cell, distance = self.__neighbors.get()
                 self.checking_cell = cell
                 self.queued_cells.remove(cell)
+
                 prev_cell_distance = self.__came_from[prev_cell][1]  # distance connected cell is from start
                 if cell not in self.__came_from.keys():
                     self.__came_from[cell] = [prev_cell, distance + prev_cell_distance]  # running total of distance
-                    self.__find_neighbors(cell, blocked_points)
+                    self.__find_neighbors(cell, end, blocked_points)
                 else:
                     known_distance = self.__came_from[cell][1]
 
                     # Check if new distance to point is less than already known distance. If so, update.
                     if distance + prev_cell_distance < known_distance:
                         self.__came_from[cell] = [prev_cell, distance + prev_cell_distance]
-                        self.__find_neighbors(cell, blocked_points)
+                        self.__find_neighbors(cell, end, blocked_points)
 
-    def __find_neighbors(self, point, blocked_points):
+    def __find_neighbors(self, point, target, blocked_points):
         """
         Method for adding adjacent cells to queue. Modifies adjacent_points directly.
         :param point: tuple || (x, y)
+        :param target: tuple || (x, y) ending cell target
         :param blocked_points: list(tuples) || list of cells that are walls
         :return: None
         """
@@ -77,6 +85,8 @@ class BFS:
                             return
                     self.__neighbors.put([next_point, point, dist(next_point, point)])
                     self.queued_cells.append(next_point)
+                    if next_point == target:
+                        self.target_found = True
 
     def __check_corner_move(self, point, next_point, blocked_points):
         """
@@ -98,7 +108,7 @@ class BFS:
         :param end: tuple || (x, y) ending cell: tuple
         :return: (Distance: int, Path: set) or (None, None)
         """
-        if len(self.__came_from) > 0 and self.__neighbors.empty():
+        if len(self.__came_from) > 0 and len(self.queued_cells) == 0:
             self.checking_cell = None
             return self.__find_path(end)
 

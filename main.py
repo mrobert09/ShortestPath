@@ -49,7 +49,7 @@ class ShortestPath:
 
     def calculate_path_with_ticks(self, tick_rate):
         # start_time = time.perf_counter()
-        self.bfs.tick(tick_rate, self.start, self.blocked_points)
+        self.bfs.tick(tick_rate, self.start, self.end, self.blocked_points)
         self.distance, self.path = self.bfs.public_find_path(self.end) or (None, None)
         # end_time = time.perf_counter()
         # print("Calculation time:", end_time - start_time)

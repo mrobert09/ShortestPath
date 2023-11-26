@@ -3,6 +3,7 @@ import _ui
 from lib.grid import Grid
 from lib.slider import Slider
 from lib.switch import Switch
+from lib.button import Button
 from lib.settings import *
 from main import ShortestPath
 
@@ -19,13 +20,12 @@ class UI(_ui.Mixin):
         pg.display.set_caption("Shortest Path")
         self.clock = pg.time.Clock()
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
-        self.draw_surface = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)
+        self.draw_surface = pg.Surface((WIDTH, HEIGHT), pg.SRCALPHA)  # separate layer for grid transparency
         self.sp = ShortestPath((0, 0), (TILEWIDTH - 1, TILEHEIGHT-1), TILEWIDTH, TILEHEIGHT)
         self.grid = Grid(TILESIZE, (TILEWIDTH, TILEHEIGHT), (X_OFFSET, Y_OFFSET))
         self.alpha_slider = Slider((600, 50), 150, 0, 255, initial_value=255)
-        # self.alpha_slider_drag = False  # probably not needed, clear soon
         self.tick_slider = Slider((600, 180), 150, 0, 100, initial_value=100)
-        # self.tick_slider_drag = False  # probably not needed, clear soon
+        self.button = Button(600, 250, 65, 65, 'BFS')
         self.switch = Switch((625, 100), 100, 25)
         self.text_widgets = []
         self.all_sprites = pg.sprite.Group()
@@ -73,6 +73,7 @@ class UI(_ui.Mixin):
             self.alpha_slider.handle_event(event)
             self.switch.handle_event(event)
             self.tick_slider.handle_event(event)
+            self.button.handle_event(event)
 
             # Grid event logic
             cell = self.grid.get_cell(pos)
@@ -124,6 +125,7 @@ class UI(_ui.Mixin):
         self.screen.blit(self.draw_surface, (0, 0))
         self.alpha_slider.draw(self.screen)
         self.tick_slider.draw(self.screen)
+        self.button.draw(self.screen)
         self.switch.draw(self.screen)
         for surface, text, color, x, y in self.text_widgets:
             self.draw_text(surface, text, color, (x, y))
