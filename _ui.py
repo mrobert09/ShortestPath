@@ -4,56 +4,60 @@ from lib.settings import *
 
 class Mixin:
     @staticmethod
-    def alter_start(cell, path, show_path, tick_rate):
+    def alter_start(cell, path, button_pressed):
         """
         Static method used for updating starting cell location.
         :param cell: tuple
         :param path: ShortestPath algorithm
-        :param show_path: Bool - True if yellow path is turned on, False if not
+        :param button_pressed: bool || State of BFS algorithm button
         :return: None
         """
         if cell and cell not in path.blocked_points:
             path.update_cell("start", cell)
-            path.bfs.clear_came_from_dict()
+            if button_pressed:
+                path.bfs.clear_came_from_dict()
 
     @staticmethod
-    def alter_end(cell, path, show_path, tick_rate):
+    def alter_end(cell, path, button_pressed):
         """
         Static method used for updating ending cell location.
         :param cell: tuple
         :param path: ShortestPath algorithm
-        :param show_path: Bool - True if yellow path is turned on, False if not
+        :param button_pressed: bool || State of BFS algorithm button
         :return: None
         """
         if cell and cell not in path.blocked_points:
             path.update_cell("end", cell)
-            path.bfs.clear_came_from_dict()
+            if button_pressed:
+                path.bfs.clear_came_from_dict()
 
     @staticmethod
-    def add_walls(cell, path, show_path, tick_rate):
+    def add_walls(cell, path, button_pressed):
         """
         Static method used for adding cells as walls.
         :param cell: tuple
         :param path: ShortestPath algorithm
-        :param show_path: Bool - True if yellow path is turned on, False if not
+        :param button_pressed: bool || State of BFS algorithm button
         :return: None
         """
         if cell and cell not in path.blocked_points:
             path.update_cell("add", cell)
-            path.bfs.clear_came_from_dict()
+            if button_pressed:
+                path.bfs.clear_came_from_dict()
 
     @staticmethod
-    def remove_walls(cell, path, show_path, tick_rate):
+    def remove_walls(cell, path, button_pressed):
         """
         Static method used for removing cells as walls.
         :param cell: tuple
         :param path: ShortestPath algorithm
-        :param show_path: Bool - True if yellow path is turned on, False if not
+        :param button_pressed: bool || State of BFS algorithm button
         :return: None
         """
         if cell and cell in path.blocked_points:
             path.update_cell("remove", cell)
-            path.bfs.clear_came_from_dict()
+            if button_pressed:
+                path.bfs.clear_came_from_dict()
 
     @staticmethod
     def update_colors(app):
@@ -62,12 +66,17 @@ class Mixin:
         :param app: Main UI instance
         :return: None
         """
-        app.grid.cell_colors[YELLOW] = app.sp.path or set()  # needed as algorithm might return None
+        if app.button.turned_on:
+            app.grid.cell_colors[YELLOW] = app.sp.path or set()  # needed as algorithm might return None
+            app.grid.cell_colors[BLUE] = set(app.sp.bfs.queued_cells)
+            app.grid.cell_colors[PINK] = {app.sp.bfs.checking_cell}
+        else:
+            app.grid.cell_colors[YELLOW] = set()
+            app.grid.cell_colors[BLUE] = set()
+            app.grid.cell_colors[PINK] = set()
         app.grid.cell_colors[GREEN] = {app.sp.start}
         app.grid.cell_colors[RED] = {app.sp.end}
         app.grid.cell_colors[BLACK] = app.sp.blocked_points
-        app.grid.cell_colors[BLUE] = set(app.sp.bfs.queued_cells)
-        app.grid.cell_colors[PINK] = {app.sp.bfs.checking_cell}
 
     @staticmethod
     def update_text(app):

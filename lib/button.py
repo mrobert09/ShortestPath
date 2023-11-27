@@ -1,5 +1,6 @@
 import pygame as pg
 
+
 class Button:
     def __init__(self, x, y, width, height, text=''):
         self.on_color = (0, 255, 0)  # Green off_color
@@ -35,12 +36,16 @@ class Button:
             font = pg.font.SysFont('Arial', 20)
             text_surface = font.render(self.text, True, (0, 0, 0))  # Black text
             surface.blit(text_surface, (self.x + (self.width - text_surface.get_width()) / 2,
-                                    self.y + (self.height - text_surface.get_height()) / 2))
+                                        self.y + (self.height - text_surface.get_height()) / 2))
 
     def handle_event(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
             if self.rect.collidepoint(event.pos):
                 self.turned_on = not self.turned_on  # turns button on and off
+                if self.turned_on:
+                    return True
+                else:
+                    return False
 
 
 def main():

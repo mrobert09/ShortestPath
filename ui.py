@@ -73,7 +73,8 @@ class UI(_ui.Mixin):
             self.alpha_slider.handle_event(event)
             self.switch.handle_event(event)
             self.tick_slider.handle_event(event)
-            self.button.handle_event(event)
+            if self.button.handle_event(event):
+                self.sp.bfs.clear_came_from_dict()  # called once button is turned on to calculate path
 
             # Grid event logic
             cell = self.grid.get_cell(pos)
@@ -81,19 +82,19 @@ class UI(_ui.Mixin):
                 if click[0] and keys[pg.K_LSHIFT]:
                     if cell and self.tick_slider.get_value() < 100:
                         self.route_freeze = True
-                    self.alter_start(cell, self.sp, self.switch.is_on(), self.tick_slider.get_value())
+                    self.alter_start(cell, self.sp, self.button.turned_on)
                 elif click[2] and keys[pg.K_LSHIFT]:
                     if cell and self.tick_slider.get_value() < 100:
                         self.route_freeze = True
-                    self.alter_end(cell, self.sp, self.switch.is_on(), self.tick_slider.get_value())
+                    self.alter_end(cell, self.sp, self.button.turned_on)
                 elif click[0] and not keys[pg.K_LSHIFT]:
                     if cell and self.tick_slider.get_value() < 100:
                         self.route_freeze = True
-                    self.add_walls(cell, self.sp, self.switch.is_on(), self.tick_slider.get_value())
+                    self.add_walls(cell, self.sp, self.button.turned_on)
                 elif click[2] and not keys[pg.K_LSHIFT]:
                     if cell and self.tick_slider.get_value() < 100:
                         self.route_freeze = True
-                    self.remove_walls(cell, self.sp, self.switch.is_on(), self.tick_slider.get_value())
+                    self.remove_walls(cell, self.sp, self.button.turned_on)
                 elif event.type == pg.MOUSEBUTTONDOWN and event.button == 2:
                     self.sp.print_info()
                 elif event.type == pg.MOUSEBUTTONUP and (event.button == 1 or event.button == 3):
@@ -105,10 +106,11 @@ class UI(_ui.Mixin):
         :return:
         """
         if self.tick_slider.get_value() < 100:
-            if not self.route_freeze:
+            if not self.route_freeze and self.button.turned_on:
                 self.sp.calculate_path_with_ticks(self.tick_slider.get_value())
         else:
-            self.sp.calculate_path_with_ticks(100000)
+            if self.button.turned_on:
+                self.sp.calculate_path_with_ticks(100000)
         self.all_sprites.update()
         self.update_colors(self)
         self.update_text(self)
